@@ -4,6 +4,7 @@ from __future__ import print_function
 import sys
 import re
 import mechanize
+import httplib
 
 URL = r"http://allegro.pl/klocki-lego-17865?buyNew=1&offerTypeBuyNow=1&order=dd&a_enum%5B128068%5D%5B3%5D=3&p="
 
@@ -32,6 +33,7 @@ def get_max_page_num(page, curr_max_page_num):
 def process_offer(offer):
     result = title_prog.search(offer)
     if result == None:
+        eprint(offer)
         eprint("Title not found")
         return
     url = result.group(1)
@@ -55,7 +57,14 @@ def main(argc, argv):
     max_page_num = 0
     while True:
         page_num += 1
-        page = b.open(URL + str(page_num)).read()
+        try:
+            page = b.open(URL + str(page_num)).read()
+        except httplib.IncompleteRead as e:
+            eprint("Incompleate read exception")
+            eprint(e.partial)
+            eprint("Retrying page {} from {}".format(page_num, max_page_num))
+            page_num -= 1
+            continue
 
         max_page_num = get_max_page_num(page, max_page_num)
         if page_num >= max_page_num:

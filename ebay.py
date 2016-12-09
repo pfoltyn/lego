@@ -33,7 +33,7 @@ def get_max_page_num(page, curr_max_page_num):
 def process_offer(offer):
     result = title_prog.search(offer)
     if result == None:
-        print(offer)
+        eprint(offer)
         eprint("Title not found")
         return
     url = "http://www.ebay.co.uk/itm/" + result.group(1)
